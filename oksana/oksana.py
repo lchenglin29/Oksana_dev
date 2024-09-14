@@ -3,7 +3,7 @@ import requests
 import base64
 
 # 以下請自行替換為自己的token
-gemini_api_key = os.environ['api_key']
+gemini_api_key = os.environ['dev_api_key']
 
 chat_history = {}
 

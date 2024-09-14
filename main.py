@@ -14,6 +14,7 @@ def textmsg(user):
 
 @bot.event
 async def on_ready():
+  await bot.tree.sync()
   #channel = bot.get_channel(1204285939124281425)
   #await channel.send('啊？啊？我醒了💦')
   print(f'{bot.user}已上線。')
