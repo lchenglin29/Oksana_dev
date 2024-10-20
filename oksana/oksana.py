@@ -1,6 +1,9 @@
 import os
 import requests
 import base64
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # 以下請自行替換為自己的token
 gemini_api_key = os.environ['dev_api_key']
@@ -29,19 +32,19 @@ generation_config = {
 safety_settings = [
   {
     "category": "HARM_CATEGORY_HARASSMENT",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+    "threshold": "BLOCK_NONE"
   },
   {
     "category": "HARM_CATEGORY_HATE_SPEECH",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+    "threshold": "BLOCK_NONE"
   },
   {
     "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+    "threshold": "BLOCK_NONE"
   },
   {
     "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+    "threshold": "BLOCK_NONE"
   },
 ]
 

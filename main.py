@@ -3,11 +3,14 @@ from discord.ext import commands
 from discord import app_commands
 import os,asyncio,datetime,aiohttp
 import keep_alive
+from dotenv import load_dotenv
+
+load_dotenv()
 
 bot_token = os.environ['DEV_TOKEN']
 
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix='o!', intents = intents)
+bot = commands.Bot(command_prefix='d!', intents = intents)
 
 def textmsg(user):
   return f'回覆:{user}'
@@ -63,5 +66,5 @@ async def main():
         await bot.start(bot_token)
 
 if __name__ == "__main__":
-    keep_alive.keep_alive()
+#    keep_alive.keep_alive()
     asyncio.run(main())

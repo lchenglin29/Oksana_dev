@@ -1,7 +1,10 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands,voice_recv
 from core.core import Cog_Extension
 from oksana.oksana import clear_chat
+from oksana.koala import k_clear_chat
+from oksana.voice import ReadText
+from oksana.speech_reco import RecoSink
 from datetime import datetime
 import asyncio
 
@@ -26,6 +29,14 @@ class cmds(Cog_Extension):
     @commands.command()
     async def clear_chat(self, ctx):
       res = clear_chat(str(ctx.channel.id))
+      if res:
+        await ctx.send('已清除')
+      else:
+        await ctx.send('沒有記錄可以清除')
+
+    @commands.command()
+    async def k_clear_chat(self, ctx):
+      res = k_clear_chat(str(ctx.channel.id))
       if res:
         await ctx.send('已清除')
       else:
@@ -64,6 +75,62 @@ class cmds(Cog_Extension):
                 await ctx.send(f"好的！{ctx.author.mention}，我會在 {date_time} 提醒你。")
         except ValueError:
             await ctx.send(f"請輸入正確的日期和時間格式，例如：2024-09-08 15:30")
+
+    @commands.command()
+    async def clear_vc(self, ctx):
+        if ctx.author.voice:
+            channel = ctx.author.voice.channel
+            res = clear_chat(str(channel.id))
+            if res:
+                await ctx.send("Cleared!")
+            else:
+                await ctx.send("No Chat History")
+        else:
+            await ctx.send("Join a voice channel first!")
+
+    @commands.command()
+    async def join(self, ctx):
+        if ctx.author.voice:
+            channel = ctx.author.voice.channel
+            try:
+                vc = await channel.connect(cls=voice_recv.VoiceRecvClient)
+            except:
+                vc = ctx.guild.voice_client
+            vc.listen(RecoSink(vc,channel))  # 開始接收音頻
+            await ctx.send(f"已加入並開始監聽: {channel}")
+
+    @commands.command()
+    async def leave(self, ctx):
+        if ctx.voice_client:
+            await ctx.voice_client.disconnect()
+            await ctx.send("已離開語音頻道！")
+
+    @commands.command()
+    async def rejoin(self, ctx):
+        if ctx.author.voice:
+            channel = ctx.author.voice.channel
+            try:
+                vc = await channel.connect(cls=voice_recv.VoiceRecvClient)
+            except:
+                vc = ctx.guild.voice_client
+            await vc.disconnect()
+            vc = await channel.connect(cls=voice_recv.VoiceRecvClient)
+            vc.listen(RecoSink(vc,channel))  # 開始接收音頻
+            await ctx.send(f"已加入並開始監聽: {channel}")
+
+
+
+    @commands.command()
+    async def read(self, ctx, * ,text):
+        if ctx.author.voice:
+            try:
+                vc = await ctx.author.voice.channel.connect(cls=voice_recv.VoiceRecvClient)
+            except:
+                vc = ctx.author.guild.voice_client 
+            if vc.is_playing():
+                vc.stop()
+            await ReadText(vc,text)
+
 
 async def setup(bot):
     await bot.add_cog(cmds(bot))
