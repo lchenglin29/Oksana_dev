@@ -70,9 +70,15 @@ def calling_Oksana(prompt,id):
   f"input: {prompt}"
   ]
 
-  chat = chat_history.setdefault(str(id),model.start_chat())
+  if str(id) not in chat_history:
+    chat = chat_history.setdefault(str(id),model.start_chat())
+    response = chat.send_message(prompt_parts)
+    print("new chat")
+  else:
+    chat = chat_history[str(id)]
+    response = chat.send_message(prompt)
+    print("read from old chat")
   print(chat)
-  response = chat.send_message(prompt_parts)
   return response.text
   
 

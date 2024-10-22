@@ -42,7 +42,7 @@ class RecoSink(SpeechRecognitionSink):
         else:
             asyncio.run(ReadText(vc,"Error! Tell Koala!"))
     @SpeechRecognitionSink.listener()
-    def on_voice_member_speaking_start(member):
+    def on_voice_member_speaking_start(self, member):
         self.vc.stop_playing()
 
 
