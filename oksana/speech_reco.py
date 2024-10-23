@@ -24,7 +24,7 @@ class RecoSink(SpeechRecognitionSink):
         super().__init__()
         self.text_cb = self.text_callback
         self.process_cb = process_cb
-        self.phrase_time_limit = 7
+        self.phrase_time_limit = 8
         self.vc = vc
         self.channel = channel
     def text_callback(self, user, text):
@@ -43,7 +43,7 @@ class RecoSink(SpeechRecognitionSink):
             asyncio.run(ReadText(vc,"Error! Tell Koala!"))
     @SpeechRecognitionSink.listener()
     def on_voice_member_speaking_start(self, member):
-        self.vc.stop_playing()
-
+        #self.vc.stop_playing()
+        pass
 
 
