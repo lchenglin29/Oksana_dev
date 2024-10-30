@@ -27,7 +27,7 @@ class event(Cog_Extension):
           user_message += f"\n{ht}:\n{html[ht]}"
       await message.channel.typing()
       try:
-        await message.reply(calling_Oksana(f"{message.author.name}：{user_message}",message.channel.id,message=message))
+        await message.reply(calling_Oksana(f"{message.author.name}：{user_message}",message.channel.id,ctx=await self.bot.get_context(message)))
       except Exception as e:
         await message.reply("-# this message has been filtered\n-# 這則訊息已被過濾")
         print(e)

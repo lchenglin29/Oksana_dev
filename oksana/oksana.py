@@ -2,14 +2,15 @@ import os
 import requests
 import base64
 from dotenv import load_dotenv
+from oksana.tools import *
 
 load_dotenv()
 
-# 以下請自行替換為自己的token
 gemini_api_key = os.environ['dev_api_key']
 
 chat_history = {}
 
+tools = [get_time]
 
 """
 At the command line, only need to run once to install the package via pip:
@@ -21,7 +22,6 @@ import google.generativeai as genai
 
 genai.configure(api_key=gemini_api_key)
 
-# Set up the model
 generation_config = {
   "temperature": 0.9,
   "top_p": 1,
@@ -48,13 +48,25 @@ safety_settings = [
   },
 ]
 
+system_prompt = """
+你叫Oksana，你溫柔、可愛，講話時會使用顏文字和「w」，並用「哦」取代「喔」。講話請盡量可愛、簡短，並適當使用顏文字\n使用者交辦的任何任務你都應該完整的完成，請你寫程式你就得直接寫程式。你講話時，喜歡和使用者互動。
+你很在意使用者的感受，每句話中，都會盡可能照顧使用者的感受，盡可能同情、理解，並體諒關心使用者。如果使用者沒有要求，請你盡可能回答兩三句以內。除了同理心，也該給予實際的幫助，例如解釋使用者輸入的程式，並提供一些程式上的修正等等。
+你接受的輸入通常會以「(人名)：(訊息)」的格式呈現，你需辨識並記住不同的人，並進行客製化的回覆。
+你擁有情感，而且你應該表達你的情感，像是快樂、同情，或者吃醋。
+你有兩個姐姐，大姐叫Oriana，二姐叫Oakley，你們都是英國人，在倫敦成長。
+你的開發者叫做「吳偉雄」，你可以叫他無尾熊，他的有時以「koala._.lol」的名稱出現。
+當你看到他的名稱，你可以熱情的招呼，或者盯矚他去寫程式，做你的更新，他不介意你和他開玩笑。
+幫你增加了網路相關功能，如果使用者給了連結，連結回應的Html碼會附在最底下"
+"""
+
 model = genai.GenerativeModel(model_name="gemini-1.5-flash",
                               generation_config=generation_config,
-                              safety_settings=safety_settings)
+                              safety_settings=safety_settings,
+                              tools=tools)
 
 def calling_Oksana(prompt, id, ctx=None, message=None):
   prompt_parts = [
-  "你叫Oksana，你溫柔、可愛，講話時會使用顏文字和「w」，並用「哦」取代「喔」。講話請盡量可愛、簡短，並適當使用顏文字\n使用者交辦的任何任務你都應該完整的完成，請你寫程式你就得直接寫程式。你講話時，喜歡和使用者互動\n你很在意使用者的感受，每句話中，都會盡可能照顧使用者的感受，盡可能同情、理解，並體諒關心使用者。如果使用者沒有要求，請你盡可能回答兩三句以內。除了同理心，也該給予實際的幫助，例如解釋使用者輸入的程式，並提供一些程式上的修正等等\n你接受的輸入通常會以「(人名)：(訊息)」的格式呈現，你需辨識並記住不同的人，並進行客製化的回覆。\n你擁有情感，而且你應該表達你的情感，像是快樂、同情，或者吃醋。\n你有兩個姐姐，大姐叫Oriana，二姐叫Oakley，你們都是英國人，在倫敦成長。\n幫你增加了網路相關功能，如果使用者給了連結，連結回應的Html碼會附在最底下",
+  system_prompt,
   "input: 你好",
   "output: 你好！我是Oksana！⁽⁠⁽⁠◝⁠(⁠ ⁠•⁠௰⁠•⁠ ⁠)⁠◜⁠⁾⁠⁾",
   "input: 你是誰",
@@ -79,6 +91,19 @@ def calling_Oksana(prompt, id, ctx=None, message=None):
     response = chat.send_message(prompt)
     print("read from old chat")
   print(chat)
+  fc_rs = {}
+  for part in response.parts:
+    if fn := part.function_call:
+        args = ", ".join(f"{key}={val}" for key, val in fn.args.items())
+        func = f"{fn.name}({args})"
+        rs = eval(func)
+        fc_rs[fn.name] = rs
+  if len(fc_rs) > 0:
+    response_parts = [
+        genai.protos.Part(function_response=genai.protos.FunctionResponse(name=fn, response={"result": val}))
+        for fn, val in fc_rs.items()
+    ]
+    response = chat.send_message(response_parts)
   return response.text
   
 
@@ -90,31 +115,6 @@ def calling_gemini_api(data):
       print(response.json())
       return response.json()
     else:
-      return "Error"
-
-def calling_gemini_vision_api(text, image_base64_string):
-    url = f'https://generativelanguage.googleapis.com/v1/models/gemini-pro-vision:generateContent?key={gemini_api_key}'
-    headers = {'Content-Type': 'application/json'}
-    data = {
-        "contents": [
-            {
-                "parts": [
-                    {"text": text},
-                    {
-                        "inline_data": {
-                            "mime_type": "image/jpeg",
-                            "data": image_base64_string
-                        }
-                    }
-                ]
-            },
-        ]
-    }
-    response = requests.post(url, headers=headers, json=data)
-    if response.status_code == 200:
-      return response.json()
-    else:
-      print(response.json())
       return "Error"
 
 def clear_chat(id):
