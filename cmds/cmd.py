@@ -96,7 +96,7 @@ class cmds(Cog_Extension):
                 vc = await channel.connect(cls=voice_recv.VoiceRecvClient)
             except:
                 vc = ctx.guild.voice_client
-            vc.listen(RecoSink(vc,channel))  # 開始接收音頻
+            vc.listen(RecoSink(vc,channel,ctx=ctx))
             await ctx.send(f"已加入並開始監聽: {channel}")
 
     @commands.command()
@@ -115,7 +115,7 @@ class cmds(Cog_Extension):
                 vc = ctx.guild.voice_client
             await vc.disconnect()
             vc = await channel.connect(cls=voice_recv.VoiceRecvClient)
-            vc.listen(RecoSink(vc,channel))  # 開始接收音頻
+            vc.listen(RecoSink(vc,channel,ctx=ctx))
             await ctx.send(f"已加入並開始監聽: {channel}")
 
 

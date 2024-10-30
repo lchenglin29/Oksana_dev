@@ -20,13 +20,14 @@ def text_cb(user, text):
     res = calling_Oksana(f"{user}:{text}")
 
 class RecoSink(SpeechRecognitionSink):
-    def __init__(self,vc,channel):
+    def __init__(self,vc,channel,ctx):
         super().__init__()
         self.text_cb = self.text_callback
         self.process_cb = process_cb
         self.phrase_time_limit = 8
         self.vc = vc
         self.channel = channel
+        self.ctx = ctx
     def text_callback(self, user, text):
         vc = self.vc
         channel = self.channel
@@ -34,7 +35,7 @@ class RecoSink(SpeechRecognitionSink):
             asyncio.run(ReadText(vc,"Error! Tell Koala!"))
             return
         print(f"{user}:{text}")
-        res = calling_Oksana(f"{user}:{text}",str(channel.id))
+        res = calling_Oksana(f"{user}:{text}",str(channel.id),ctx=self.ctx)
         if res:
             if vc.is_playing():
                 vc.stop_playing()
