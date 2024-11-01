@@ -1,6 +1,7 @@
 import os
 import requests
 import base64
+import asyncio
 from dotenv import load_dotenv
 from oksana.tools import *
 
@@ -10,7 +11,7 @@ gemini_api_key = os.environ['dev_api_key']
 
 chat_history = {}
 
-tools = [get_time]
+tools = [get_time, get_weather]
 
 """
 At the command line, only need to run once to install the package via pip:
@@ -64,7 +65,7 @@ model = genai.GenerativeModel(model_name="gemini-1.5-flash",
                               safety_settings=safety_settings,
                               tools=tools)
 
-def calling_Oksana(prompt, id, ctx=None, message=None):
+def calling_Oksana(prompt, id, ctx=None, img=None):
   prompt_parts = [
   system_prompt,
   "input: 你好",
@@ -88,15 +89,21 @@ def calling_Oksana(prompt, id, ctx=None, message=None):
     print("new chat")
   else:
     chat = chat_history[str(id)]
-    response = chat.send_message(prompt)
+    if img is not None:
+        response = chat.send_message([prompt, *img])
+    else:
+        response = chat.send_message(prompt)
     print("read from old chat")
   print(chat)
   fc_rs = {}
   for part in response.parts:
     if fn := part.function_call:
-        args = ", ".join(f"{key}={val}" for key, val in fn.args.items())
+        args = ", ".join(f"{key}={repr(val)}" for key, val in fn.args.items())
         func = f"{fn.name}({args})"
+        print(func)
         rs = eval(func)
+        #loop = asyncio.get_event_loop()
+        #loop.create_task(ctx.send(f"-#running {fn.name}"))
         fc_rs[fn.name] = rs
   if len(fc_rs) > 0:
     response_parts = [

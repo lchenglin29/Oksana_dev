@@ -4,7 +4,9 @@ from core.core import Cog_Extension
 from oksana.oksana import calling_Oksana
 from oksana.koala import calling_Koala
 from oksana.internet import extract_urls,get_html
-
+import requests
+from io import BytesIO
+from PIL import Image
 
 class event(Cog_Extension):
   @commands.Cog.listener()
@@ -25,9 +27,20 @@ class event(Cog_Extension):
       if len(html) > 0:
         for ht in html:
           user_message += f"\n{ht}:\n{html[ht]}"
+      imgs = []
+      try:
+        if message.attachments:
+          for attachment in message.attachments:
+            if any(attachment.filename.lower().endswith(ext) for ext in ['jpg', 'jpeg', 'png', 'gif']):
+                response = requests.get(attachment.url)
+                img_data = BytesIO(response.content)
+                img = Image.open(img_data)
+                imgs.append(img)
+      except Exception as e:
+        print(e)
       await message.channel.typing()
       try:
-        await message.reply(calling_Oksana(f"{message.author.name}：{user_message}",message.channel.id,ctx=await self.bot.get_context(message)))
+        await message.reply(calling_Oksana(f"{message.author.name}：{user_message}",message.channel.id,ctx=await self.bot.get_context(message), **({"img":imgs} if imgs else {})))
       except Exception as e:
         await message.reply("-# this message has been filtered\n-# 這則訊息已被過濾")
         print(e)
