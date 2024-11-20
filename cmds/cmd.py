@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands,voice_recv
 from core.core import Cog_Extension
-from oksana.oksana import clear_chat
+from oksana.oksana import clear_chat,calling_Oksana
 from oksana.koala import k_clear_chat
 from oksana.voice import ReadText
 from oksana.speech_reco import RecoSink
@@ -130,7 +130,18 @@ class cmds(Cog_Extension):
             if vc.is_playing():
                 vc.stop()
             await ReadText(vc,text)
-
+    @commands.command()
+    async def sum(self,ctx,limit:int = 10):
+        messages = []
+        async for message in ctx.channel.history(limit=limit):
+            messages.append({
+                "author": message.author.name,
+                "content": message.content,
+                "timestamp": message.created_at.strftime("%Y-%m-%d %H:%M:%S")
+            })
+        await ctx.channel.typing()
+        res = calling_Oksana(f"[System]: Now, Oksana, pls summarize the following conversation with zh-TW and the length of response must lower than 1500:\n\n{messages}",ctx.channel.id)
+        await ctx.reply(res)
 
 async def setup(bot):
     await bot.add_cog(cmds(bot))

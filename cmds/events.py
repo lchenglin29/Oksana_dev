@@ -16,7 +16,7 @@ class event(Cog_Extension):
     if self.bot.user.mention in message.content or isinstance(message.channel,discord.DMChannel):
       if message.content == "d!clear_chat":
           return
-      user_message = message.content.replace(f'<@{self.bot.user.id}>','Oksana')
+      user_message = message.content.replace(f'<@{self.bot.user.id}>','')
       urls = extract_urls(user_message)
       html = {}
       for url in urls:
