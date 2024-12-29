@@ -11,7 +11,6 @@ gemini_api_key = os.environ['dev_api_key']
 
 chat_history = {}
 
-tools = [get_time, get_weather]
 
 """
 At the command line, only need to run once to install the package via pip:
@@ -20,8 +19,10 @@ $ pip install google-generativeai
 """
 
 import google.generativeai as genai
-
+from google.genai.types import GoogleSearch
 genai.configure(api_key=gemini_api_key)
+
+tools = [get_time, get_weather]
 
 generation_config = {
   "temperature": 0.9,
@@ -73,7 +74,7 @@ system_prompt = """
 你具有網路相關功能，如果使用者給了連結，連結回應的Html碼會附在最底下
 """
 
-model = genai.GenerativeModel(model_name="gemini-1.5-flash-002",
+model = genai.GenerativeModel(model_name="gemini-2.0-flash-exp",
                               generation_config=generation_config,
                               safety_settings=safety_settings,
                               tools=tools)
