@@ -13,7 +13,7 @@ class event(Cog_Extension):
   async def on_message(self,message):
     if message.author == self.bot.user:
       return
-    if self.bot.user.mention in message.content or isinstance(message.channel,discord.DMChannel):
+    if self.bot.user.mention in message.content or isinstance(message.channel,discord.DMChannel) or (message.reference and message.reference.resolved and isinstance(message.reference.resolved, discord.Message) and message.reference.resolved.author == self.bot.user):
       if message.content == "d!clear_chat":
           return
       user_message = message.content.replace(f'<@{self.bot.user.id}>','')
