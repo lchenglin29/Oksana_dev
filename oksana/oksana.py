@@ -2,6 +2,7 @@ import os
 import requests
 import base64
 import asyncio
+import csv
 from dotenv import load_dotenv
 from oksana.tools import *
 
@@ -79,6 +80,12 @@ model = genai.GenerativeModel(model_name="gemini-2.0-flash-exp",
                               safety_settings=safety_settings,
                               tools=tools)
 
+def log(p,r):
+    data = csv.writer(open("data/log.csv", 'a+'))
+    data.writerow('')
+    data.writerow([f"input: {p}",f"output: {p}"])
+
+
 def calling_Oksana(prompt, id, ctx=None, img=None):
   prompt_parts = [
   system_prompt,
@@ -125,6 +132,7 @@ def calling_Oksana(prompt, id, ctx=None, img=None):
         for fn, val in fc_rs.items()
     ]
     response = chat.send_message(response_parts)
+  log(prompt,response.text)
   return response.text
   
 
