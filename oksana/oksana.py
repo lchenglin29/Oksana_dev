@@ -77,13 +77,13 @@ system_prompt = """
 
 model = genai.GenerativeModel(model_name="gemini-2.0-flash-exp",
                               generation_config=generation_config,
-                              safety_settings=safety_settings,
+                              
                               tools=tools)
 
 def log(p,r):
     data = csv.writer(open("data/log.csv", 'a+'))
-    data.writerow('')
-    data.writerow([f"input: {p}",f"output: {p}"])
+    #data.writerow('')
+    data.writerow([f"input: {p}",f"output: {r}"])
 
 
 def calling_Oksana(prompt, id, ctx=None, img=None):

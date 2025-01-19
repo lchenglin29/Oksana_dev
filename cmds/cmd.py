@@ -43,36 +43,26 @@ class cmds(Cog_Extension):
         await ctx.send('沒有記錄可以清除')
 
     async def reminder(self, ctx, reminder_message, delay):
-        print('等等提醒')
-#        await asyncio.sleep(delay)
-        for i in range(1, int(delay)+1):
-            if i == delay:
-              print('提醒！')
-              await ctx.send(f"{ctx.author.mention}, 這是你的提醒：{reminder_message}")
-              break
-            else:
-              print('提醒？')
-            await asyncio.sleep(1)
+        await asyncio.sleep(delay)
+        await ctx.send(f"{ctx.author.mention}\n{reminder_message}")
 
-    # 指定日期和時間設置提醒
     @commands.command()
     async def remindme(self, ctx, date:str, time: str, *, message: str):
-        # 解析使用者輸入的日期時間 (格式: YYYY-MM-DD HH:MM)
         try:
             date_time = f'{date} {time}'
             target_time = datetime.strptime(date_time, "%Y-%m-%d %H:%M")
             now = datetime.now()
-
-            # 計算當前時間與目標時間之間的差
             delay = (target_time - now).total_seconds()
-
-            # 如果目標時間在過去，則無法設置提醒
             if delay <= 0:
                 await ctx.send(f"{ctx.author.mention}, 指定的時間已經過去了，請輸入未來的時間。")
             else:
-                self.bot.loop.create_task(self.reminder(ctx, message, delay))
-
-                await ctx.send(f"好的！{ctx.author.mention}，我會在 {date_time} 提醒你。")
+                embed = discord.Embed(
+                    title="📌 | 新增提醒",
+                    description=f"日期：{date}\n時間：{time}\n訊息內容：{message}",
+                    color = discord.Color.green()
+                )
+                await ctx.send(f"好的！{ctx.author.mention}，我會在 {date_time} 提醒你。",embed=embed)
+                await self.reminder(ctx, message, delay)
         except ValueError:
             await ctx.send(f"請輸入正確的日期和時間格式，例如：2024-09-08 15:30")
 
