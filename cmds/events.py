@@ -4,6 +4,7 @@ from core.core import Cog_Extension
 from oksana.oksana import calling_Oksana
 from oksana.koala import calling_Koala
 from oksana.internet import extract_urls,get_html
+from oksana.tools import get_time
 import requests
 from io import BytesIO
 from PIL import Image
@@ -40,7 +41,7 @@ class event(Cog_Extension):
         print(e)
       await message.channel.typing()
       try:
-        await message.reply(calling_Oksana(f"{message.author.name}：{user_message}",message.channel.id,ctx=await self.bot.get_context(message), **({"img":imgs} if imgs else {})))
+        await message.reply(calling_Oksana(f"[{get_time()}]{message.author.name}：{user_message}",message.channel.id,ctx=await self.bot.get_context(message), **({"img":imgs} if imgs else {})))
       except Exception as e:
         await message.reply("-# this message has been filtered\n-# 這則訊息已被過濾")
         print(e)

@@ -23,7 +23,7 @@ import google.generativeai as genai
 from google.genai.types import GoogleSearch
 genai.configure(api_key=gemini_api_key)
 
-tools = [get_time, get_weather, get_stock_price, get_stock_saleInfo, get_stock_info]
+tools = [get_weather, get_stock_price, get_stock_saleInfo, get_stock_info]
 
 generation_config = {
   "temperature": 0.9,

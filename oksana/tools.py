@@ -105,7 +105,7 @@ def get_stock_saleInfo(code:str):
         cells = tb.find_all('td')
         data = {
                     '日期': cells[0].text,
-                    "營收": cells[7].get_text(strip=True),
+                    "營收": cells[7].get_text(strip=True) + " 億元新台幣",
                     "月增": cells[8].get_text(strip=True),
                     "年增": cells[9].get_text(strip=True),
             "累計年增": 
